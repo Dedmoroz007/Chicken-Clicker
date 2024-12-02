@@ -1,1 +1,561 @@
+<!DOCTYPE html>
 
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Uncle Beef's Chicken Clicker</title>
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            display: flex;
+
+            justify-content: left;
+
+            align-items: left;
+
+            height: 100vh;
+
+            margin-top: 100px;
+
+            background-color: #8e96aa;
+
+            transform: scale(3);  /* Adjust the scale factor here (1.5 makes everything 50% bigger) */
+
+            transform-origin: top left;  /* Ensures the scaling starts from the top-left corner */
+
+        }
+
+        .container {
+
+            text-align: center;
+
+        }
+
+        .button-container {
+
+            position: relative;
+
+            display: inline-block;
+
+            width: 200px;
+
+            height: 50px;
+
+        }
+
+        button {
+
+            padding: 10px 20px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            background-color: #c2913d;
+
+            color: rgb(30, 6, 6);
+
+            border: none;
+
+            border-radius: 5px;
+
+            position: relative;
+
+            z-index: 2; /* Button text stays above the progress bar initially */
+
+            width: 100%;
+
+            height: 100%;
+
+            overflow: hidden; /* Prevent progress bar from overflowing the button */
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center; /* Center the button text */
+
+        }
+
+        button:hover {
+
+            background-color: #8c571c;
+
+        }
+
+        /* Progress bar that fills the entire button */
+
+        .progressBar {
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 0%; /* Start from 0% width */
+
+            height: 100%;
+
+            background-color: #973416;
+
+            z-index: 1; /* Progress bar is behind the button text */
+
+        }
+
+        .progressBarText {
+
+            position: absolute;
+
+            top: 50%;
+
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            z-index: 2; /* Make sure the text stays above the progress bar */
+
+            visibility: hidden; /* Hide the text initially */
+
+        }
+
+        button:active {
+
+            background-color: #dd5d22;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+<div class="container">
+
+    <div class="button-container">
+
+        <button id="BuyRawButton" onclick="RawChickenBuy()">Buy Chicken</button>
+
+        <div id="RawChickenCounter" style="margin-top: 20px;">Chickens: 1</div>
+
+        <div class="progressBar" id="BuyRawProgressBar"></div>
+
+        <div class="progressBarText" id="BuyRawProgressBarText">Purchasing</div> <!-- Fixed text -->
+
+    </div>
+
+    <div class="button-container">
+
+        <button id="ButcherButton" onclick="ButcherChicken()">Butcher Chicken</button>
+
+        <div id="RawWingCounter" style="margin-top: 20px;">Raw Wings: 0</div>
+
+        <div class="progressBar" id="ButcheringProgressBar"></div>
+
+        <div class="progressBarText" id="ButcheringProgressBarText">Butchering</div> <!-- Fixed text -->
+
+    </div>
+
+    <div class="button-container">
+
+        <button id="startButton" onclick="startTimer()">Fry Chicken Wing</button>
+
+        <div id="ChickenWingCounter" style="margin-top: 20px;">Fried Wings: 0</div>
+
+        <!-- Progress bar is inside the button -->
+
+        <div class="progressBar" id="progressBar"></div>
+
+        <div class="progressBarText" id="progressBarText">Cooking</div> <!-- Fixed text -->
+
+    </div>
+
+
+
+    <div class="button-container">
+
+        <button id="sellButton" onclick="Sell()">Sell</button>
+
+        <div id="MoneyCounter" style="margin-top: 20px;">$0.00</div>
+
+        <!-- Progress bar for sell button -->
+
+        <div class="progressBar" id="sellProgressBar"></div>
+
+        <div class="progressBarText" id="sellProgressBarText">Selling</div> <!-- Selling text -->
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    let wingcount = 0;
+
+    let money = 0;
+
+    let chicken = 1;
+
+    let rawwing = 0;
+
+
+
+    function RawChickenBuy() {
+
+    if (money > 3){
+
+    const BuyRawButton = document.getElementById('BuyRawButton');
+
+    const BuyProgressBar = document.getElementById('BuyRawProgressBar');
+
+    const BuyProgressBarText = document.getElementById('BuyRawProgressBarText');
+
+    
+
+    // Disable Buy button and reset progress bar
+
+    BuyRawButton.disabled = true;  
+
+    BuyRawButton.style.opacity = 0; 
+
+    BuyProgressBar.style.width = '0%';  // Reset progress bar
+
+    BuyProgressBar.style.transition = 'none';  // Disable transition initially
+
+    BuyProgressBarText.style.visibility = 'visible';  // Show "Selling" text
+
+    
+
+    // Start the progress bar animation
+
+    setTimeout(() => {
+
+        BuyProgressBar.style.transition = 'width 1s linear';  // Smooth 1 second transition
+
+        BuyProgressBar.style.width = '100%';  // Fill the progress bar over 1 second
+
+        
+
+        // After 1 second, update the money and reset the progress bar
+
+        setTimeout(() => {
+
+            if (money < 3) {
+
+                document.getElementById('BuyRawButton').disabled = true;  
+
+            }
+
+            money -= 3;  // Deduct $3 per raw chicken
+
+            
+
+            chicken++;    // Increment chicken count
+
+            document.getElementById('MoneyCounter').innerText = '$' + money + '.00';
+
+            document.getElementById('RawChickenCounter').textContent = 'Chickens: ' + chicken;
+
+            
+
+           
+
+            // Reset the progress bar and re-enable the button after progress
+
+            BuyProgressBar.style.width = '0%';  // Reset progress bar
+
+            BuyProgressBarText.style.visibility = 'hidden';  // Hide "Selling" text
+
+            BuyRawButton.disabled = false;  // Re-enable the button after progress
+
+            BuyRawButton.style.opacity = 1;  // Make the button visible again
+
+        }, 1000);  // Wait for 1 second to finish progress animation
+
+
+
+    }, 50);  // Small delay before starting progress 
+
+    }}
+
+
+
+    function ButcherChicken() {
+
+        if (chicken > 0){
+
+        const ButcherButton = document.getElementById('ButcherButton');
+
+        const progressBar = document.getElementById('ButcheringProgressBar');
+
+        const progressBarText = document.getElementById('ButcheringProgressBarText');
+
+        
+
+        ButcherButton.disabled = true; // Disable the button to prevent multiple clicks
+
+        ButcherButton.style.opacity = 0; // Make the button invisible
+
+        progressBar.style.width = '0%';  // Reset progress bar to 0%
+
+
+
+        // Initially, disable the transition to reset the progress bar
+
+        ButcheringProgressBar.style.transition = 'none'; 
+
+        ButcheringProgressBarText.style.visibility = 'visible';  // Show "Cooking" text when progress starts
+
+        setTimeout(() => {
+
+            // Enable smooth transition after the progress starts
+
+            ButcheringProgressBar.style.transition = 'width 4s linear'; // Smooth transition over 4 seconds
+
+            ButcheringProgressBar.style.width = '100%';  // Animate to fill the button's width
+
+
+
+            // After 4 seconds, update the wing count and reset the progress bar
+
+            setTimeout(() => {
+
+                chicken--;
+
+                rawwing += 2; //get 2 wings per chicken
+
+                document.getElementById('RawWingCounter').textContent = 'Raw Wings: ' + rawwing;
+
+                document.getElementById('RawChickenCounter').textContent = 'Chickens: ' + chicken;
+
+
+
+                // Reset progress bar back to 0% width
+
+                ButcheringProgressBar.style.width = '0%';
+
+
+
+                // Re-enable the button after the reset and make it visible again
+
+                ButcherButton.disabled = false;
+
+                ButcherButton.style.opacity = 1; // Make the button visible again
+
+                
+
+                // Hide the "Cooking" text after the progress completes
+
+                ButcheringProgressBarText.style.visibility = 'hidden';
+
+            }, 4000); // Wait for the 4-second progress to finish before resetting
+
+
+
+        }, 50); // Small delay before starting progress
+
+    }}
+
+
+
+    function startTimer() {
+
+        if (rawwing > 0){
+
+        const button = document.getElementById('startButton');
+
+        const progressBar = document.getElementById('progressBar');
+
+        const progressBarText = document.getElementById('progressBarText');
+
+        
+
+        button.disabled = true; // Disable the button to prevent multiple clicks
+
+        button.style.opacity = 0; // Make the button invisible
+
+        progressBar.style.width = '0%';  // Reset progress bar to 0%
+
+
+
+        // Initially, disable the transition to reset the progress bar
+
+        progressBar.style.transition = 'none'; 
+
+        progressBarText.style.visibility = 'visible';  // Show "Cooking" text when progress starts
+
+        setTimeout(() => {
+
+            // Enable smooth transition after the progress starts
+
+            progressBar.style.transition = 'width 4s linear'; // Smooth transition over 4 seconds
+
+            progressBar.style.width = '100%';  // Animate to fill the button's width
+
+
+
+            // After 4 seconds, update the wing count and reset the progress bar
+
+            setTimeout(() => {
+
+                // Increment the counter
+
+                rawwing--;
+
+                wingcount++;
+
+                document.getElementById('ChickenWingCounter').textContent = 'Fried Wings: ' + wingcount;
+
+                document.getElementById('RawWingCounter').textContent = 'Raw Wings: ' + rawwing;
+
+                if (wingcount > 0) {
+
+                    document.getElementById('sellButton').disabled = false;
+
+                }
+
+
+
+                // Reset progress bar back to 0% width
+
+                progressBar.style.width = '0%';
+
+
+
+                // Re-enable the button after the reset and make it visible again
+
+                button.disabled = false;
+
+                button.style.opacity = 1; // Make the button visible again
+
+                
+
+                // Hide the "Cooking" text after the progress completes
+
+                progressBarText.style.visibility = 'hidden';
+
+            }, 4000); // Wait for the 4-second progress to finish before resetting
+
+
+
+        }, 50); // Small delay before starting progress
+
+    }}
+
+
+
+    
+
+    function Sell() {
+
+        if (wingcount > 0) {
+
+            // Disable the Sell button and start progress animation
+
+            const sellButton = document.getElementById('sellButton');
+
+            const sellProgressBar = document.getElementById('sellProgressBar');
+
+            const sellProgressBarText = document.getElementById('sellProgressBarText');
+
+            
+
+            // Disable sell button and reset progress bar
+
+            sellButton.disabled = true;  
+
+            sellButton.style.opacity = 0; // Make the button invisible
+
+            sellProgressBar.style.width = '0%';  // Reset progress bar
+
+            sellProgressBar.style.transition = 'none';  // Disable transition initially
+
+            sellProgressBarText.style.visibility = 'visible';  // Show "Selling" text
+
+            
+
+            // Start the progress bar animation
+
+            setTimeout(() => {
+
+                sellProgressBar.style.transition = 'width 1s linear';  // Smooth 1 second transition
+
+                sellProgressBar.style.width = '100%';  // Fill the progress bar over 1 second
+
+                
+
+                // After 1 second, update the money and reset the progress bar
+
+                setTimeout(() => {
+
+                    wingcount--;  // Decrement the wing count
+
+                    money += 5;  // Add $5 per wing
+
+                    document.getElementById('MoneyCounter').innerText = '$' + money + '.00';
+
+                    document.getElementById('ChickenWingCounter').textContent = 'Fried Wings: ' + wingcount;
+
+
+
+                    // Disable the Sell button when there are no wings left to sell
+
+                    if (wingcount === 0) {
+
+                        document.getElementById('sellButton').disabled = true;
+
+                    }
+
+
+
+                    // Reset the sell progress bar
+
+                    sellProgressBar.style.width = '0%';
+
+                    sellProgressBarText.style.visibility = 'hidden';  // Hide "Selling" text
+
+                    sellButton.disabled = false;  // Re-enable the button after progress
+
+                    sellButton.style.opacity = 1; // Make the button visible again
+
+                }, 1000);  // Wait for 1 second to finish progress animation
+
+
+
+            }, 50);  // Small delay before starting progress
+
+        }
+
+    }
+
+    
+
+
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
